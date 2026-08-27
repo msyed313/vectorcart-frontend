@@ -12,6 +12,8 @@ import CompanySettings from "./pages/CompanySettings";
 import Shop from "./pages/Shop";
 import ProductsAdmin from "./pages/admin/ProductsAdmin";
 import CategoriesAdmin from "./pages/admin/CategoriesAdmin";
+import ProductDetail from "./pages/ProductDetail";
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -40,6 +42,7 @@ export default function App() {
 <Route path="/admin/categories" element={
   <ProtectedRoute allowedRoles={["Admin"]}><CategoriesAdmin /></ProtectedRoute>
 } />
+<Route path="/products/:id" element={<ProductDetail />} />
               </Routes>
             </main>
             <Footer />
