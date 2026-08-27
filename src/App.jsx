@@ -13,40 +13,55 @@ import Shop from "./pages/Shop";
 import ProductsAdmin from "./pages/admin/ProductsAdmin";
 import CategoriesAdmin from "./pages/admin/CategoriesAdmin";
 import ProductDetail from "./pages/ProductDetail";
+import { CartProvider } from "./context/CartContext";
+import CartDrawer from "./components/CartDrawer";
+import Checkout from "./pages/Orders/Checkout";
+import Orders from "./pages/Orders/Orders";
+import OrdersAdmin from "./pages/admin/OrdersAdmin";
 
 export default function App() {
   return (
-    <BrowserRouter>
+   <BrowserRouter>
       <CompanyProvider>
         <AuthProvider>
-          <div className="min-h-screen flex flex-col">
-            <Navbar />
-            <main className="flex-1">
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route
-                  path="/admin/company"
-                  element={
-                    <ProtectedRoute allowedRoles={["Admin"]}>
-                      <CompanySettings />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route path="/shop" element={<Shop />} />
-<Route path="/admin/products" element={
-  <ProtectedRoute allowedRoles={["Admin"]}><ProductsAdmin /></ProtectedRoute>
+          <CartProvider>
+            <div className="min-h-screen flex flex-col">
+              <Navbar />
+              <CartDrawer />
+              <main className="flex-1">
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/shop" element={<Shop />} />
+                  <Route path="/products/:id" element={<ProductDetail />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/checkout" element={
+                    <ProtectedRoute><Checkout /></ProtectedRoute>
+                  } />
+                 <Route path="/orders" element={
+  <ProtectedRoute allowedRoles={["Customer"]}><Orders /></ProtectedRoute>
 } />
-<Route path="/admin/categories" element={
-  <ProtectedRoute allowedRoles={["Admin"]}><CategoriesAdmin /></ProtectedRoute>
+<Route path="/orders/:id" element={
+  <ProtectedRoute allowedRoles={["Customer"]}><Orders /></ProtectedRoute>
 } />
-<Route path="/products/:id" element={<ProductDetail />} />
-              </Routes>
-            </main>
-            <Footer />
-          </div>
+                  <Route path="/admin/company" element={
+                    <ProtectedRoute allowedRoles={["Admin"]}><CompanySettings /></ProtectedRoute>
+                  } />
+                  <Route path="/admin/products" element={
+                    <ProtectedRoute allowedRoles={["Admin"]}><ProductsAdmin /></ProtectedRoute>
+                  } />
+                  <Route path="/admin/categories" element={
+                    <ProtectedRoute allowedRoles={["Admin"]}><CategoriesAdmin /></ProtectedRoute>
+                  } />
+                  <Route path="/admin/orders" element={
+  <ProtectedRoute allowedRoles={["Admin"]}><OrdersAdmin /></ProtectedRoute>
+} />
+                </Routes>
+              </main>
+              <Footer />
+            </div>
+          </CartProvider>
         </AuthProvider>
       </CompanyProvider>
     </BrowserRouter>

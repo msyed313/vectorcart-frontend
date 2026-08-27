@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { ShoppingCart, Sparkles, LogOut, User } from "lucide-react";
 import { useCompany } from "../context/CompanyContext";
 import { useAuth } from "../context/AuthContext";
-
+import { useCart } from "../context/CartContext";
 function getInitials(name) {
   if (!name) return "VC";
   const words = name.trim().split(/\s+/);
@@ -17,17 +17,18 @@ export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
   const [imgFailed, setImgFailed] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-
+const { itemCount, setDrawerOpen } = useCart();
   const showRealLogo = !loading && logoSrc && !imgFailed;
   const companyName = company?.companyName || "VectorCart";
 
-  const navLinks = [
+const navLinks = [
   { label: "Shop", href: "/shop" },
   { label: "Search", href: "/search", badge: true },
-  { label: "Orders", href: "/orders" },
+  ...(user?.role !== "Admin" ? [{ label: "Orders", href: "/orders" }] : []),
   ...(user?.role === "Admin" ? [
     { label: "Products", href: "/admin/products" },
     { label: "Categories", href: "/admin/categories" },
+    { label: "Orders", href: "/admin/orders" },
     { label: "Settings", href: "/admin/company" },
   ] : []),
 ];
@@ -75,9 +76,17 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-3">
-          <button className="btn-primary text-sm !px-4 !py-2.5 flex items-center gap-2">
-            <ShoppingCart size={16} /> Cart
-          </button>
+         <button
+  onClick={() => setDrawerOpen(true)}
+  className="relative btn-primary text-sm !px-4 !py-2.5 flex items-center gap-2"
+>
+  <ShoppingCart size={16} /> Cart
+  {itemCount > 0 && (
+    <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-accent text-ink text-[10px] font-bold flex items-center justify-center">
+      {itemCount}
+    </span>
+  )}
+</button>
 
           {isAuthenticated ? (
             <div className="relative">

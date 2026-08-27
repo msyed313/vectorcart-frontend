@@ -6,7 +6,8 @@ import { productsApi } from "../api/productsApi";
 import { reviewsApi } from "../api/reviewsApi";
 import { useAuth } from "../context/AuthContext";
 import StarRating from "../components/StarRating";
-
+import { useCart } from "../context/CartContext";
+import { useState as useStateAlias } from "react"; 
 const API_ORIGIN = (import.meta.env.VITE_API_BASE_URL || "https://localhost:7045/api").replace("/api", "");
 
 export default function ProductDetail() {
@@ -18,7 +19,8 @@ export default function ProductDetail() {
   const [reviewForm, setReviewForm] = useState({ rating: 0, comment: "" });
   const [submitting, setSubmitting] = useState(false);
   const [reviewError, setReviewError] = useState(null);
-
+const { addItem } = useCart();
+const [addingToCart, setAddingToCart] = useState(false);
   const load = () => productsApi.getFull(id).then(setProduct).finally(() => setLoading(false));
   useEffect(() => { setLoading(true); load(); }, [id]);
 
@@ -41,6 +43,14 @@ export default function ProductDetail() {
     }
   };
 
+  const handleAddToCart = async () => {
+  setAddingToCart(true);
+  try {
+    await addItem(product.productId, 1);
+  } finally {
+    setAddingToCart(false);
+  }
+};
   const handleDeleteReview = async (reviewId) => {
     await reviewsApi.delete(id, reviewId);
     load();
@@ -152,9 +162,14 @@ export default function ProductDetail() {
             </div>
           )}
 
-          <button disabled={!product.inStock} className="btn-primary w-full mt-8">
-            {product.inStock ? "Add to cart" : "Out of stock"}
-          </button>
+          <button
+  disabled={!product.inStock || addingToCart}
+  onClick={handleAddToCart}
+  className="btn-primary w-full mt-8 flex items-center justify-center gap-2"
+>
+  {addingToCart && <Loader2 size={16} className="animate-spin" />}
+  {!product.inStock ? "Out of stock" : addingToCart ? "Adding…" : "Add to cart"}
+</button>
         </div>
       </div>
 
