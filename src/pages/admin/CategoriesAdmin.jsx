@@ -1,6 +1,31 @@
 import { useEffect, useState } from "react";
-import { Plus, Trash2, FolderTree, AlertCircle } from "lucide-react";
+import { Plus, Trash2, FolderTree, AlertCircle, CornerDownRight } from "lucide-react";
 import { categoriesApi } from "../../api/categoriesApi";
+import SearchableSelect from "../../components/SearchableSelect";
+import { buildCategoryTree, flattenCategoryOptions } from "../../utils/categoryTree";
+
+function CategoryNode({ node, depth, onDelete }) {
+  return (
+    <>
+      <div
+        className="flex items-center justify-between py-3.5 pr-5 border-b border-border last:border-0"
+        style={{ paddingLeft: `${20 + depth * 28}px` }}
+      >
+        <div className="flex items-center gap-2.5">
+          {depth > 0 && <CornerDownRight size={14} className="text-slate-300 shrink-0" />}
+          <FolderTree size={15} className="text-primary shrink-0" />
+          <span className="text-sm text-ink">{node.categoryName}</span>
+        </div>
+        <button onClick={() => onDelete(node.categoryId)} className="text-slate-400 hover:text-danger transition-colors shrink-0">
+          <Trash2 size={16} />
+        </button>
+      </div>
+      {node.children.map((child) => (
+        <CategoryNode key={child.categoryId} node={child} depth={depth + 1} onDelete={onDelete} />
+      ))}
+    </>
+  );
+}
 
 export default function CategoriesAdmin() {
   const [categories, setCategories] = useState([]);
@@ -39,6 +64,9 @@ export default function CategoriesAdmin() {
     }
   };
 
+  const tree = buildCategoryTree(categories);
+  const parentOptions = flattenCategoryOptions(categories);
+
   return (
     <div className="max-w-3xl mx-auto px-6 py-16">
       <h1 className="text-3xl">Categories</h1>
@@ -52,16 +80,15 @@ export default function CategoriesAdmin() {
           required
           className="input-field flex-1"
         />
-        <select
-          value={form.parentCategoryId}
-          onChange={(e) => setForm({ ...form, parentCategoryId: e.target.value })}
-          className="input-field sm:w-48"
-        >
-          <option value="">No parent (top-level)</option>
-          {categories.map((c) => (
-            <option key={c.categoryId} value={c.categoryId}>{c.categoryName}</option>
-          ))}
-        </select>
+        <div className="sm:w-56">
+          <SearchableSelect
+            options={parentOptions}
+            value={form.parentCategoryId}
+            onChange={(val) => setForm({ ...form, parentCategoryId: val })}
+            placeholder="No parent (top-level)"
+            isClearable
+          />
+        </div>
         <button type="submit" disabled={saving} className="btn-primary flex items-center gap-2 whitespace-nowrap">
           <Plus size={16} /> Add
         </button>
@@ -71,28 +98,11 @@ export default function CategoriesAdmin() {
         <p className="flex items-center gap-2 text-sm text-danger mb-4"><AlertCircle size={15} />{error}</p>
       )}
 
-      <div className="card !p-0 divide-y divide-border">
+      <div className="card !p-0">
         {categories.length === 0 ? (
           <p className="text-sm text-body p-6 text-center">No categories yet.</p>
         ) : (
-          categories.map((c) => (
-            <div key={c.categoryId} className="flex items-center justify-between px-5 py-3.5">
-              <div className="flex items-center gap-2.5">
-                <FolderTree size={15} className="text-primary" />
-                <span className="text-sm text-ink">
-                  {c.parentCategoryId && (
-                    <span className="text-slate-400">
-                      {categories.find((p) => p.categoryId === c.parentCategoryId)?.categoryName} /{" "}
-                    </span>
-                  )}
-                  {c.categoryName}
-                </span>
-              </div>
-              <button onClick={() => handleDelete(c.categoryId)} className="text-slate-400 hover:text-danger transition-colors">
-                <Trash2 size={16} />
-              </button>
-            </div>
-          ))
+          tree.map((root) => <CategoryNode key={root.categoryId} node={root} depth={0} onDelete={handleDelete} />)
         )}
       </div>
     </div>

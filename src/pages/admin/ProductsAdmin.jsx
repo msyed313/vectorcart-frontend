@@ -5,7 +5,8 @@ import {
 } from "lucide-react";
 import { productsApi } from "../../api/productsApi";
 import { categoriesApi } from "../../api/categoriesApi";
-
+import SearchableSelect from "../../components/SearchableSelect";
+import { flattenCategoryOptions } from "../../utils/categoryTree";
 const EMPTY_FORM = { productName: "", description: "", price: "", stockQuantity: "", categoryId: "", isActive: true };
 const API_ORIGIN = (import.meta.env.VITE_API_BASE_URL || "https://localhost:7045/api").replace("/api", "");
 
@@ -191,13 +192,14 @@ export default function ProductsAdmin() {
                   onChange={(e) => setForm({ ...form, stockQuantity: e.target.value })} className="input-field" />
               </div>
               <div className="sm:col-span-2">
-                <label className="block text-sm font-medium text-ink mb-1.5">Category</label>
-                <select required value={form.categoryId}
-                  onChange={(e) => setForm({ ...form, categoryId: e.target.value })} className="input-field">
-                  <option value="">Select a category…</option>
-                  {categories.map((c) => <option key={c.categoryId} value={c.categoryId}>{c.categoryName}</option>)}
-                </select>
-              </div>
+  <label className="block text-sm font-medium text-ink mb-1.5">Category</label>
+  <SearchableSelect
+    options={flattenCategoryOptions(categories)}
+    value={form.categoryId}
+    onChange={(val) => setForm({ ...form, categoryId: val })}
+    placeholder="Select a category…"
+  />
+</div>
               <div className="sm:col-span-2">
                 <label className="block text-sm font-medium text-ink mb-1.5">Description</label>
                 <textarea rows={3} value={form.description}

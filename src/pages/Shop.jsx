@@ -4,7 +4,8 @@ import { Search, SlidersHorizontal, ChevronLeft, ChevronRight } from "lucide-rea
 import { productsApi } from "../api/productsApi";
 import { categoriesApi } from "../api/categoriesApi";
 import ProductCard from "../components/ProductCard";
-
+import SearchableSelect from "../components/SearchableSelect";
+import { flattenCategoryOptions } from "../utils/categoryTree";
 export default function Shop() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -53,26 +54,28 @@ export default function Shop() {
             />
           </div>
 
-          <select
-            value={filters.categoryId}
-            onChange={(e) => handleFilterChange("categoryId", e.target.value)}
-            className="input-field !py-2.5 w-44"
-          >
-            <option value="">All categories</option>
-            {categories.map((c) => (
-              <option key={c.categoryId} value={c.categoryId}>{c.categoryName}</option>
-            ))}
-          </select>
+          <div className="w-52">
+  <SearchableSelect
+    options={flattenCategoryOptions(categories)}
+    value={filters.categoryId}
+    onChange={(val) => handleFilterChange("categoryId", val)}
+    placeholder="All categories"
+    isClearable
+  />
+</div>
 
-          <select
-            value={filters.sortBy}
-            onChange={(e) => handleFilterChange("sortBy", e.target.value)}
-            className="input-field !py-2.5 w-40"
-          >
-            <option value="">Newest</option>
-            <option value="priceAsc">Price: Low to High</option>
-            <option value="priceDesc">Price: High to Low</option>
-          </select>
+<div className="w-48">
+  <SearchableSelect
+    options={[
+      { value: "", label: "Newest" },
+      { value: "priceAsc", label: "Price: Low to High" },
+      { value: "priceDesc", label: "Price: High to Low" },
+    ]}
+    value={filters.sortBy}
+    onChange={(val) => handleFilterChange("sortBy", val)}
+    placeholder="Sort by"
+  />
+</div>
         </div>
       </div>
 
