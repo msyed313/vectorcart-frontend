@@ -26,4 +26,5 @@ addImage: (id, file, isPrimary = false) => {
 },
 deleteImage: (id, imageId) => apiClient.delete(`/products/${id}/images/${imageId}`),
 setPrimaryImage: (id, imageId) => apiClient.put(`/products/${id}/images/${imageId}/primary`, {}),
+getSimilar: (id, limit = 4) => apiClient.get(`/products/${id}/similar?limit=${limit}`),
 };

@@ -18,7 +18,8 @@ import CartDrawer from "./components/CartDrawer";
 import Checkout from "./pages/Orders/Checkout";
 import Orders from "./pages/Orders/Orders";
 import OrdersAdmin from "./pages/admin/OrdersAdmin";
-
+import Search from "./pages/Search";
+import ChatWidget from "./components/ChatWidget";
 export default function App() {
   return (
    <BrowserRouter>
@@ -28,10 +29,12 @@ export default function App() {
             <div className="min-h-screen flex flex-col">
               <Navbar />
               <CartDrawer />
+              <ChatWidget />
               <main className="flex-1">
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/shop" element={<Shop />} />
+                  <Route path="/search" element={<Search />} />
                   <Route path="/products/:id" element={<ProductDetail />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />

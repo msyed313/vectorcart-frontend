@@ -8,6 +8,7 @@ import { useAuth } from "../context/AuthContext";
 import StarRating from "../components/StarRating";
 import { useCart } from "../context/CartContext";
 import { useState as useStateAlias } from "react"; 
+import ProductCard from "../components/ProductCard";
 const API_ORIGIN = (import.meta.env.VITE_API_BASE_URL || "https://localhost:7045/api").replace("/api", "");
 
 export default function ProductDetail() {
@@ -23,6 +24,10 @@ const { addItem } = useCart();
 const [addingToCart, setAddingToCart] = useState(false);
   const load = () => productsApi.getFull(id).then(setProduct).finally(() => setLoading(false));
   useEffect(() => { setLoading(true); load(); }, [id]);
+const [similar, setSimilar] = useState([]);
+useEffect(() => {
+  productsApi.getSimilar(id).then(setSimilar).catch(() => {});
+}, [id]);
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();
@@ -230,6 +235,14 @@ const [addingToCart, setAddingToCart] = useState(false);
               </div>
             ))
           )}
+          {similar.length > 0 && (
+  <div className="max-w-7xl mx-auto mt-16">
+    <h2 className="text-2xl mb-6">You might also like</h2>
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+      {similar.map((p) => <ProductCard key={p.productId} product={p} />)}
+    </div>
+  </div>
+)}
         </div>
       </div>
     </div>
