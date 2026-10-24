@@ -20,6 +20,8 @@ import Orders from "./pages/Orders/Orders";
 import OrdersAdmin from "./pages/admin/OrdersAdmin";
 import Search from "./pages/Search";
 import ChatWidget from "./components/ChatWidget";
+import Dashboard from "./pages/admin/Dashboard";
+
 export default function App() {
   return (
    <BrowserRouter>
@@ -42,6 +44,9 @@ export default function App() {
                   <Route path="/checkout" element={
                     <ProtectedRoute><Checkout /></ProtectedRoute>
                   } />
+                  <Route path="/admin/dashboard" element={
+  <ProtectedRoute allowedRoles={["Admin"]}><Dashboard /></ProtectedRoute>
+} />
                  <Route path="/orders" element={
   <ProtectedRoute allowedRoles={["Customer"]}><Orders /></ProtectedRoute>
 } />
